@@ -40,5 +40,13 @@ const ready = app.ready();
 
 module.exports = async (req, res) => {
   await ready;
+
+  // Vercel rewrites everything to this catch-all function; the true path
+  // isn't reliably preserved on req.url, but the matched segments always
+  // are, via req.query.path. Rebuild req.url from those before handing the
+  // request to Fastify's own router.
+  const { path } = req.query;
+  req.url = '/' + (Array.isArray(path) ? path.join('/') : path || '');
+
   app.server.emit('request', req, res);
 };
