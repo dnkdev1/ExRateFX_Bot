@@ -2,6 +2,10 @@ const fs = require('fs');
 const path = require('path');
 
 function loadBotToken() {
+  if (process.env.BOT_TOKEN) {
+    return process.env.BOT_TOKEN.trim();
+  }
+
   const envPath = path.resolve(__dirname, '..', '..', '..', '.env');
   const content = fs.readFileSync(envPath, 'utf8');
   const match = content.match(/^BOT_TOKEN=(.*)$/m);
