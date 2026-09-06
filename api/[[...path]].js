@@ -45,7 +45,9 @@ module.exports = async (req, res) => {
   // sets req.url to that rewritten destination rather than the original
   // request path. Strip the /api prefix back off before handing the
   // request to Fastify's own router.
+  const before = req.url;
   req.url = req.url.replace(/^\/api/, '') || '/';
+  console.log('[debug] req.url before:', before, 'after:', req.url);
 
   app.server.emit('request', req, res);
 };
