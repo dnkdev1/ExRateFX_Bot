@@ -47,7 +47,13 @@ app.listen({ port: PORT }, (err) => {
   }
   console.log(`Webhook server listening on port ${PORT}`);
 
-  // brings up a public URL and keeps the Telegram webhook registered against it
+  if (process.env.VERCEL) {
+    return;
+  }
+
+  // local dev only: brings up a public URL and keeps the Telegram webhook
+  // registered against it. On Vercel there's already a public URL, and
+  // scripts/registerWebhook.js handles registration instead.
   const webhookRegistrar = new TelegramWebhookRegistrar(token);
   const tunnel = new CloudflareTunnelManager({
     port: PORT,
