@@ -1,5 +1,5 @@
 class MessengerGateway {
-  async sendMessage(chatId, text) {
+  async sendMessage(_chatId, _text) {
     throw new Error('not implemented');
   }
 }

@@ -1,5 +1,5 @@
 class MessageRepository {
-  async save(message) {
+  async save(_message) {
     throw new Error('not implemented');
   }
 
