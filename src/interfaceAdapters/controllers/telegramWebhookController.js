@@ -1,5 +1,9 @@
-function makeTelegramWebhookController(recordMessageUseCase, answerCurrencyQueryUseCase) {
+function makeTelegramWebhookController(recordMessageUseCase, answerCurrencyQueryUseCase, expectedToken) {
   return async function telegramWebhookController(req, reply) {
+    if (req.params.token !== expectedToken) {
+      return reply.code(404).send();
+    }
+
     const update = req.body;
     console.log(update);
 

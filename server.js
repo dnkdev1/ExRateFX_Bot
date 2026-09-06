@@ -16,7 +16,7 @@ const { makeTelegramWebhookController } = require('./src/interfaceAdapters/contr
 
 const token = loadBotToken();
 const PORT = process.env.PORT || 3000;
-const WEBHOOK_PATH = `/webhook/${token}`;
+const WEBHOOK_PATH = `/webhook/${token}`; // used only to build the public URL registered with Telegram
 
 // infrastructure: concrete implementations of the application ports
 const messageRepository = new InMemoryMessageRepository();
@@ -35,8 +35,7 @@ const answerCurrencyQueryUseCase = new AnswerCurrencyQueryUseCase(
 
 // interface adapters: controllers, wired to their use cases
 const app = createApp({
-  webhookPath: WEBHOOK_PATH,
-  telegramWebhookController: makeTelegramWebhookController(recordMessageUseCase, answerCurrencyQueryUseCase),
+  telegramWebhookController: makeTelegramWebhookController(recordMessageUseCase, answerCurrencyQueryUseCase, token),
   messagesPageController: makeMessagesPageController(listMessagesUseCase),
 });
 

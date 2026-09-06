@@ -13,7 +13,6 @@ const { makeMessagesPageController } = require('../src/interfaceAdapters/control
 const { makeTelegramWebhookController } = require('../src/interfaceAdapters/controllers/telegramWebhookController');
 
 const token = loadBotToken();
-const WEBHOOK_PATH = `/webhook/${token}`;
 
 // infrastructure: concrete implementations of the application ports.
 // No tunnel and no webhook self-registration here: Vercel already provides
@@ -33,8 +32,7 @@ const answerCurrencyQueryUseCase = new AnswerCurrencyQueryUseCase(
 );
 
 const app = createApp({
-  webhookPath: WEBHOOK_PATH,
-  telegramWebhookController: makeTelegramWebhookController(recordMessageUseCase, answerCurrencyQueryUseCase),
+  telegramWebhookController: makeTelegramWebhookController(recordMessageUseCase, answerCurrencyQueryUseCase, token),
   messagesPageController: makeMessagesPageController(listMessagesUseCase),
 });
 
