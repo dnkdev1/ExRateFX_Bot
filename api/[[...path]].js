@@ -41,17 +41,11 @@ const ready = app.ready();
 module.exports = async (req, res) => {
   await ready;
 
-  if (req.url.startsWith('/api/__debug')) {
-    res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify({ url: req.url, method: req.method, query: req.query || null }));
-    return;
-  }
-
-  // vercel.json rewrites every request to /api/<original path>, and Vercel
-  // sets req.url to that rewritten destination rather than the original
-  // request path. Strip the /api prefix back off before handing the
-  // request to Fastify's own router.
-  req.url = req.url.replace(/^\/api/, '') || '/';
-
-  app.server.emit('request', req, res);
+  res.setHeader('content-type', 'application/json');
+  res.end(JSON.stringify({
+    debugMarker: 'UNCONDITIONAL-DEBUG-V1',
+    url: req.url,
+    method: req.method,
+    headers: req.headers,
+  }));
 };
