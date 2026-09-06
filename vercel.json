@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/api/app" },
+    { "source": "/messages.json", "destination": "/api/app" },
     { "source": "/webhook/(.*)", "destination": "/api/app" }
   ]
 }

@@ -10,6 +10,7 @@ const { ListMessagesUseCase } = require('../src/application/useCases/ListMessage
 const { AnswerCurrencyQueryUseCase } = require('../src/application/useCases/AnswerCurrencyQueryUseCase');
 
 const { makeMessagesPageController } = require('../src/interfaceAdapters/controllers/messagesPageController');
+const { makeMessagesJsonController } = require('../src/interfaceAdapters/controllers/messagesJsonController');
 const { makeTelegramWebhookController } = require('../src/interfaceAdapters/controllers/telegramWebhookController');
 
 const token = loadBotToken();
@@ -34,6 +35,7 @@ const answerCurrencyQueryUseCase = new AnswerCurrencyQueryUseCase(
 const app = createApp({
   telegramWebhookController: makeTelegramWebhookController(recordMessageUseCase, answerCurrencyQueryUseCase, token),
   messagesPageController: makeMessagesPageController(listMessagesUseCase),
+  messagesJsonController: makeMessagesJsonController(listMessagesUseCase),
 });
 
 const ready = app.ready();
