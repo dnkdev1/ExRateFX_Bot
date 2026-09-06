@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
 
   res.setHeader('content-type', 'application/json');
   res.end(JSON.stringify({
-    debugMarker: 'UNCONDITIONAL-DEBUG-V1',
+    debugMarker: 'FRESH-FUNCTION-NAME-V2',
     url: req.url,
     method: req.method,
     headers: req.headers,
