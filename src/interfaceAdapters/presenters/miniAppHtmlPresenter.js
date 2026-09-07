@@ -197,10 +197,19 @@ function renderMiniAppHtml() {
       tg.expand();
     }
 
-    document.getElementById('closeBtn').addEventListener('click', function () {
-      window.open('', '_self');
-      window.close();
-    });
+    // tg.initData is only populated when the page is actually launched from
+    // Telegram (as opposed to telegram-web-app.js just being loaded in a
+    // plain browser tab, where it still defines window.Telegram.WebApp).
+    var insideTelegram = !!(tg && tg.initData);
+    var closeBtn = document.getElementById('closeBtn');
+    if (insideTelegram) {
+      closeBtn.style.display = 'none';
+    } else {
+      closeBtn.addEventListener('click', function () {
+        window.open('', '_self');
+        window.close();
+      });
+    }
 
     document.querySelectorAll('.tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
