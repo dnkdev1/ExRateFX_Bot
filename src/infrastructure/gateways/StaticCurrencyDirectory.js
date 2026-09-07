@@ -98,6 +98,10 @@ class StaticCurrencyDirectory extends CurrencyDirectory {
 
     return resolveRussian(trimmed);
   }
+
+  async listSupportedCodes() {
+    return [...SUPPORTED_CODES];
+  }
 }
 
 module.exports = { StaticCurrencyDirectory };

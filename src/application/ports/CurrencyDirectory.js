@@ -3,6 +3,11 @@ class CurrencyDirectory {
   async resolveCode(_input) {
     throw new Error('not implemented');
   }
+
+  // lists every ISO code this directory can resolve
+  async listSupportedCodes() {
+    throw new Error('not implemented');
+  }
 }
 
 module.exports = { CurrencyDirectory };

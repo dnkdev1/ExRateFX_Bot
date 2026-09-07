@@ -2,6 +2,9 @@
   "rewrites": [
     { "source": "/", "destination": "/api/app" },
     { "source": "/messages.json", "destination": "/api/app" },
+    { "source": "/app", "destination": "/api/app" },
+    { "source": "/rates.json", "destination": "/api/app" },
+    { "source": "/my-messages.json", "destination": "/api/app" },
     { "source": "/webhook/(.*)", "destination": "/api/app" }
   ]
 }
