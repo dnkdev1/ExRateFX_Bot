@@ -2,6 +2,8 @@ const { loadBotToken } = require('../src/infrastructure/config/loadBotToken');
 const { InMemoryMessageRepository } = require('../src/infrastructure/repositories/InMemoryMessageRepository');
 const { StaticCurrencyDirectory } = require('../src/infrastructure/gateways/StaticCurrencyDirectory');
 const { ExchangeRateApiGateway } = require('../src/infrastructure/gateways/ExchangeRateApiGateway');
+const { CoinGeckoRateGateway } = require('../src/infrastructure/gateways/CoinGeckoRateGateway');
+const { CompositeCurrencyRateGateway } = require('../src/infrastructure/gateways/CompositeCurrencyRateGateway');
 const { TelegramMessengerGateway } = require('../src/infrastructure/gateways/TelegramMessengerGateway');
 const { createApp } = require('../src/infrastructure/http/createApp');
 
@@ -27,7 +29,7 @@ const token = loadBotToken();
 // every cold start. Run scripts/registerWebhook.js once per deployment URL.
 const messageRepository = new InMemoryMessageRepository();
 const currencyDirectory = new StaticCurrencyDirectory();
-const currencyRateGateway = new ExchangeRateApiGateway();
+const currencyRateGateway = new CompositeCurrencyRateGateway(new ExchangeRateApiGateway(), new CoinGeckoRateGateway());
 const messengerGateway = new TelegramMessengerGateway(token);
 
 const recordMessageUseCase = new RecordMessageUseCase(messageRepository);

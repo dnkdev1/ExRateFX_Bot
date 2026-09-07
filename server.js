@@ -2,6 +2,8 @@ const { loadBotToken } = require('./src/infrastructure/config/loadBotToken');
 const { InMemoryMessageRepository } = require('./src/infrastructure/repositories/InMemoryMessageRepository');
 const { StaticCurrencyDirectory } = require('./src/infrastructure/gateways/StaticCurrencyDirectory');
 const { ExchangeRateApiGateway } = require('./src/infrastructure/gateways/ExchangeRateApiGateway');
+const { CoinGeckoRateGateway } = require('./src/infrastructure/gateways/CoinGeckoRateGateway');
+const { CompositeCurrencyRateGateway } = require('./src/infrastructure/gateways/CompositeCurrencyRateGateway');
 const { TelegramMessengerGateway } = require('./src/infrastructure/gateways/TelegramMessengerGateway');
 const { createApp } = require('./src/infrastructure/http/createApp');
 const { CloudflareTunnelManager } = require('./src/infrastructure/tunnel/CloudflareTunnelManager');
@@ -28,7 +30,7 @@ const WEBHOOK_PATH = `/webhook/${token}`; // used only to build the public URL r
 // infrastructure: concrete implementations of the application ports
 const messageRepository = new InMemoryMessageRepository();
 const currencyDirectory = new StaticCurrencyDirectory();
-const currencyRateGateway = new ExchangeRateApiGateway();
+const currencyRateGateway = new CompositeCurrencyRateGateway(new ExchangeRateApiGateway(), new CoinGeckoRateGateway());
 const messengerGateway = new TelegramMessengerGateway(token);
 
 // application: use cases, wired to their ports

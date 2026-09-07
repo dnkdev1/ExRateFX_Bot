@@ -1,8 +1,13 @@
 const { CurrencyDirectory } = require('../../application/ports/CurrencyDirectory');
 
+// the 5 most widely recognized cryptocurrencies; priced via CoinGecko
+// rather than the fiat exchange-rate API (see CoinGeckoRateGateway)
+const CRYPTO_CODES = new Set(['BTC', 'ETH', 'USDT', 'BNB', 'XRP']);
+
 const SUPPORTED_CODES = new Set([
   'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'NZD',
   'SEK', 'KRW', 'SGD', 'NOK', 'MXN', 'INR', 'BRL', 'TRY', 'ZAR', 'VND',
+  ...CRYPTO_CODES,
 ]);
 
 const NAME_TO_CODE = {
@@ -26,6 +31,11 @@ const NAME_TO_CODE = {
   'turkish lira': 'TRY', 'lira': 'TRY',
   'south african rand': 'ZAR', 'rand': 'ZAR',
   'vietnamese dong': 'VND', 'dong': 'VND',
+  'bitcoin': 'BTC',
+  'ethereum': 'ETH', 'ether': 'ETH',
+  'tether': 'USDT',
+  'binance coin': 'BNB', 'binancecoin': 'BNB',
+  'ripple': 'XRP',
 };
 
 // Russian is heavily declined (доллар/доллара/долларов/долларами/...), so instead of
@@ -45,6 +55,17 @@ const RU_QUALIFIED_STEMS = [
   ['южноафрикан', 'ZAR'],
   ['южно-африкан', 'ZAR'],
   ['южнокорейск', 'KRW'],
+];
+
+const RU_CRYPTO_STEMS = [
+  ['биткоин', 'BTC'],
+  ['биткойн', 'BTC'],
+  ['эфириум', 'ETH'],
+  ['эфир', 'ETH'],
+  ['тезер', 'USDT'],
+  ['тетер', 'USDT'],
+  ['бинанс', 'BNB'],
+  ['рипл', 'XRP'],
 ];
 
 const RU_BARE_STEMS = [
@@ -75,6 +96,8 @@ const FLAG_BY_CODE = {
   CAD: '🇨🇦', CHF: '🇨🇭', CNY: '🇨🇳', HKD: '🇭🇰', NZD: '🇳🇿',
   SEK: '🇸🇪', KRW: '🇰🇷', SGD: '🇸🇬', NOK: '🇳🇴', MXN: '🇲🇽',
   INR: '🇮🇳', BRL: '🇧🇷', TRY: '🇹🇷', ZAR: '🇿🇦', VND: '🇻🇳',
+  // cryptocurrencies aren't tied to a country, so they get a coin icon instead of a flag
+  BTC: '🪙', ETH: '🪙', USDT: '🪙', BNB: '🪙', XRP: '🪙',
 };
 
 function resolveRussian(lower) {
@@ -82,6 +105,9 @@ function resolveRussian(lower) {
   if (!/[а-я]/.test(normalized)) return null;
 
   for (const [stem, code] of RU_QUALIFIED_STEMS) {
+    if (normalized.includes(stem)) return code;
+  }
+  for (const [stem, code] of RU_CRYPTO_STEMS) {
     if (normalized.includes(stem)) return code;
   }
   for (const [stem, code] of RU_BARE_STEMS) {
@@ -117,4 +143,4 @@ class StaticCurrencyDirectory extends CurrencyDirectory {
   }
 }
 
-module.exports = { StaticCurrencyDirectory };
+module.exports = { StaticCurrencyDirectory, CRYPTO_CODES };
