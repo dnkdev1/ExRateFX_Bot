@@ -28,9 +28,33 @@ function renderMiniAppHtml() {
     font-size: 15px;
   }
 
+  .top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
   h1 {
     font-size: 20px;
     margin: 4px 0 2px;
+  }
+
+  .close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    margin-top: 4px;
+    border: none;
+    border-radius: 50%;
+    background: var(--secondary-bg);
+    color: var(--hint);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
   }
 
   .subtitle {
@@ -143,8 +167,13 @@ function renderMiniAppHtml() {
 </style>
 </head>
 <body>
-  <h1>ExRateFX Dashboard</h1>
-  <p class="subtitle">Live rates and your query history</p>
+  <div class="top-row">
+    <div>
+      <h1>ExRateFX Dashboard</h1>
+      <p class="subtitle">Live rates and your query history</p>
+    </div>
+    <button type="button" class="close-btn" id="closeBtn" aria-label="Close">✕</button>
+  </div>
 
   <div class="tabs">
     <div class="tab active" data-panel="rates">Live Rates</div>
@@ -166,7 +195,21 @@ function renderMiniAppHtml() {
     if (tg) {
       tg.ready();
       tg.expand();
+
+      if (tg.MainButton) {
+        tg.MainButton.setText('Close');
+        tg.MainButton.onClick(function () { tg.close(); });
+        tg.MainButton.show();
+      }
     }
+
+    document.getElementById('closeBtn').addEventListener('click', function () {
+      if (tg) {
+        tg.close();
+      } else {
+        window.location.href = '/';
+      }
+    });
 
     document.querySelectorAll('.tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
