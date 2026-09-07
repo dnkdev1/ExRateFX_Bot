@@ -68,10 +68,10 @@ const RU_BARE_STEMS = [
   ['киви', 'NZD'],
 ];
 
-// flag shown alongside each currency; EUR uses the EU flag since the euro
-// isn't tied to one country
+// flag shown alongside each currency; EUR uses the euro banknote emoji
+// instead of the EU flag, which renders poorly on several platforms
 const FLAG_BY_CODE = {
-  USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', JPY: '🇯🇵', AUD: '🇦🇺',
+  USD: '🇺🇸', EUR: '💶', GBP: '🇬🇧', JPY: '🇯🇵', AUD: '🇦🇺',
   CAD: '🇨🇦', CHF: '🇨🇭', CNY: '🇨🇳', HKD: '🇭🇰', NZD: '🇳🇿',
   SEK: '🇸🇪', KRW: '🇰🇷', SGD: '🇸🇬', NOK: '🇳🇴', MXN: '🇲🇽',
   INR: '🇮🇳', BRL: '🇧🇷', TRY: '🇹🇷', ZAR: '🇿🇦', VND: '🇻🇳',
