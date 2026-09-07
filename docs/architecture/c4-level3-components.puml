@@ -1,0 +1,83 @@
+@startuml C4_Level3_Components_WebApplication
+
+title Component Diagram — Web Application container (C4 Level 3)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultTextAlignment left
+skinparam rectangle {
+  BackgroundColor<<Router>>     #6B4FBB
+  FontColor<<Router>>           #FFFFFF
+  BorderColor<<Router>>         #4A3485
+
+  BackgroundColor<<Controller>> #1168BD
+  FontColor<<Controller>>       #FFFFFF
+  BorderColor<<Controller>>     #0B4884
+
+  BackgroundColor<<UseCase>>    #2E9E6C
+  FontColor<<UseCase>>          #FFFFFF
+  BorderColor<<UseCase>>        #1F7350
+
+  BackgroundColor<<Gateway>>    #D08A1E
+  FontColor<<Gateway>>          #FFFFFF
+  BorderColor<<Gateway>>        #8C5C10
+
+  BackgroundColor<<External>>   #999999
+  FontColor<<External>>         #FFFFFF
+  BorderColor<<External>>       #6B6B6B
+}
+
+rectangle "Fastify Router\n<<Component>>\n--\ncreateApp.js — registers\nevery HTTP route" <<Router>> as Router
+
+package "Interface Adapters" {
+  rectangle "TelegramWebhookController\n<<Component>>" <<Controller>> as WebhookCtrl
+  rectangle "MessagesPageController /\nMessagesJsonController\n<<Component>>" <<Controller>> as MessagesCtrl
+  rectangle "MiniAppController\n<<Component>>\n--\npage / rates.json /\nmy-messages.json" <<Controller>> as MiniAppCtrl
+  rectangle "HTML Presenters\n<<Component>>\n--\nmessagesHtmlPresenter,\nminiAppHtmlPresenter" <<Controller>> as Presenters
+}
+
+package "Application (Use Cases)" {
+  rectangle "AnswerCurrencyQueryUseCase\n<<Component>>\n--\nParses bilingual (EN/RU),\ncompound currency queries" <<UseCase>> as AnswerUC
+  rectangle "RecordMessageUseCase /\nListMessagesUseCase\n<<Component>>" <<UseCase>> as MessageUCs
+  rectangle "GetLiveRatesUseCase\n<<Component>>" <<UseCase>> as RatesUC
+}
+
+package "Infrastructure (Gateways)" {
+  rectangle "StaticCurrencyDirectory\n<<Component>>\n--\nEN/RU currency names,\ncodes & flags" <<Gateway>> as CurrencyDir
+  rectangle "ExchangeRateApiGateway\n<<Component>>" <<Gateway>> as RatesGateway
+  rectangle "TelegramMessengerGateway\n<<Component>>" <<Gateway>> as MessengerGateway
+  rectangle "InMemoryMessageRepository\n<<Component>>" <<Gateway>> as MessageRepo
+  rectangle "verifyTelegramInitData\n<<Component>>\n--\nHMAC-validates Mini App\nauth tokens" <<Gateway>> as InitDataVerifier
+}
+
+rectangle "Telegram Bot API\n<<External System>>" <<External>> as TelegramApi
+rectangle "Exchange Rate API\n<<External System>>" <<External>> as RatesApi
+
+Router --> WebhookCtrl : "POST /webhook/:token"
+Router --> MessagesCtrl : "GET /, /messages.json"
+Router --> MiniAppCtrl : "GET /app, /rates.json,\n/my-messages.json"
+
+WebhookCtrl --> MessageUCs : "records incoming\nmessage + bot reply"
+WebhookCtrl --> AnswerUC : "answers currency\nqueries"
+WebhookCtrl --> MessengerGateway : "sends dashboard\nbutton (/start etc.)"
+
+AnswerUC --> CurrencyDir : "resolves currency\ncodes & flags"
+AnswerUC --> RatesGateway : "gets live rates"
+AnswerUC --> MessengerGateway : "sends reply"
+
+MessagesCtrl --> MessageUCs : "lists messages"
+MessagesCtrl --> Presenters : "renders HTML"
+MiniAppCtrl --> Presenters : "renders dashboard HTML"
+MiniAppCtrl --> RatesUC : "gets live rates"
+MiniAppCtrl --> InitDataVerifier : "authenticates the\nMini App user"
+MiniAppCtrl --> MessageUCs : "lists that user's\nmessages"
+
+RatesUC --> CurrencyDir : "lists supported\ncodes"
+RatesUC --> RatesGateway : "gets live rates"
+
+MessageUCs --> MessageRepo : "save / list"
+
+MessengerGateway --> TelegramApi
+RatesGateway --> RatesApi
+
+@enduml

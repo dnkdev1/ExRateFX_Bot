@@ -1,0 +1,38 @@
+@startuml C4_Level2_Containers_ExRateFX_Bot
+
+title Container Diagram — ExRateFX Bot (C4 Level 2)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam rectangle {
+  BackgroundColor<<Person>>    #08427B
+  FontColor<<Person>>          #FFFFFF
+  BorderColor<<Person>>        #052E56
+
+  BackgroundColor<<Container>> #1168BD
+  FontColor<<Container>>       #FFFFFF
+  BorderColor<<Container>>     #0B4884
+
+  BackgroundColor<<External>>  #999999
+  FontColor<<External>>        #FFFFFF
+  BorderColor<<External>>      #6B6B6B
+}
+
+rectangle "Telegram User\n<<Person>>" <<Person>> as TelegramUser
+rectangle "Operator / Viewer\n<<Person>>" <<Person>> as Viewer
+
+package "ExRateFX Bot [Software System]" {
+  rectangle "Web Application\n<<Container: Node.js, Fastify>>\n--\nHandles the Telegram webhook,\nserves the Mini App dashboard\nand the messages log page.\nStateless: its in-memory\nmessage log resets on every\ncold start.\n--\nRuns as a Vercel Serverless\nFunction (api/app.js) in\nproduction, or as server.js\nbehind a Cloudflare tunnel\nfor local development." <<Container>> as WebApp
+}
+
+rectangle "Telegram Bot API\n<<External System>>" <<External>> as TelegramApi
+rectangle "Exchange Rate API\n(open.er-api.com)\n<<External System>>" <<External>> as RatesApi
+
+TelegramUser --> TelegramApi : "Sends queries /\nreceives replies"
+TelegramApi --> WebApp : "Forwards messages\n[HTTPS webhook, JSON]\nPOST /webhook/:token"
+WebApp --> TelegramApi : "Sends replies &\ndashboard buttons\n[HTTPS, Bot API]"
+WebApp --> RatesApi : "Fetches live exchange\nrates [HTTPS, JSON]"
+Viewer --> WebApp : "Views messages log &\ndashboard [HTTPS]\nGET /, /app,\n/messages.json, /rates.json,\n/my-messages.json"
+
+@enduml
