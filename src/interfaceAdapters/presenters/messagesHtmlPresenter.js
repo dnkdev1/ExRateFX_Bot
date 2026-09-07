@@ -85,12 +85,7 @@ function renderMessagesHtml(messages) {
   }
 
   header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
   }
 
   h1 {
@@ -103,16 +98,6 @@ function renderMessagesHtml(messages) {
     font-size: 13px;
     margin: 4px 0 0;
   }
-
-  .dashboard-link {
-    font-size: 13px;
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-
-  .dashboard-link:hover { text-decoration: underline; }
 
   .log {
     display: flex;
@@ -181,11 +166,8 @@ function renderMessagesHtml(messages) {
 <body>
 <main>
   <header>
-    <div>
-      <h1>Messages</h1>
-      <p class="subtitle">Live log of bot conversations, newest first</p>
-    </div>
-    <a class="dashboard-link" href="/app">📊 Open Dashboard</a>
+    <h1>Messages</h1>
+    <p class="subtitle">Live log of bot conversations, newest first</p>
   </header>
   <div class="log" id="messages">${rows || emptyState}</div>
 </main>
