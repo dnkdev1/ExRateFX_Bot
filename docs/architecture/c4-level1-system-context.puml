@@ -1,0 +1,38 @@
+@startuml C4_Level1_SystemContext_ExRateFX_Bot
+
+title System Context Diagram — ExRateFX Bot (C4 Level 1)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam rectangle {
+  BackgroundColor<<Person>>   #08427B
+  FontColor<<Person>>         #FFFFFF
+  BorderColor<<Person>>       #052E56
+
+  BackgroundColor<<System>>   #1168BD
+  FontColor<<System>>         #FFFFFF
+  BorderColor<<System>>       #0B4884
+
+  BackgroundColor<<External>> #999999
+  FontColor<<External>>       #FFFFFF
+  BorderColor<<External>>     #6B6B6B
+}
+
+rectangle "Telegram User\n<<Person>>\n--\nSends currency conversion\nqueries (English or Russian)\nand reads replies in a\nTelegram chat" <<Person>> as TelegramUser
+
+rectangle "Operator / Viewer\n<<Person>>\n--\nViews the logged chat\nmessages via a web page" <<Person>> as Viewer
+
+rectangle "ExRateFX Bot\n<<Software System>>\n--\nParses natural-language,\nmulti-currency queries,\nconverts amounts between\ncurrencies, and replies\nvia Telegram" <<System>> as Bot
+
+rectangle "Telegram Bot API\n<<External System>>\n--\nMessaging platform that\ndelivers user messages to\nthe bot via webhook and\nsends the bot's replies\nback to users" <<External>> as TelegramApi
+
+rectangle "Exchange Rate API\n(open.er-api.com)\n<<External System>>\n--\nProvides live currency\nexchange rates" <<External>> as RatesApi
+
+TelegramUser --> TelegramApi : "Sends queries /\nreceives replies"
+TelegramApi --> Bot : "Forwards messages\n[HTTPS webhook, JSON]"
+Bot --> TelegramApi : "Sends replies\n[HTTPS, Bot API]"
+Bot --> RatesApi : "Fetches exchange rates\n[HTTPS, JSON]"
+Viewer --> Bot : "Views message log\n[HTTP, GET /, /messages.json]"
+
+@enduml
