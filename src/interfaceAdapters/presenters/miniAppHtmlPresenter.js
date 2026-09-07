@@ -106,6 +106,17 @@ function renderMiniAppHtml() {
     font-size: 13px;
   }
 
+  .rate-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--hint);
+    margin: 16px 0 4px;
+  }
+
+  .rate-section-label:first-child { margin-top: 0; }
+
   .as-of {
     color: var(--hint);
     font-size: 12px;
@@ -185,28 +196,39 @@ function renderMiniAppHtml() {
         .replace(/"/g, '&quot;');
     }
 
+    var CRYPTO_CODES = ['BTC', 'ETH', 'USDT', 'BNB', 'XRP'];
+
+    function renderRateRows(entries) {
+      var logs = entries.map(function (entry) { return Math.log10(entry[1]); });
+      var minLog = Math.min.apply(null, logs);
+      var maxLog = Math.max.apply(null, logs);
+      var span = maxLog - minLog || 1;
+
+      return entries.map(function (entry) {
+        var code = entry[0], value = entry[1];
+        var pct = Math.max(4, ((Math.log10(value) - minLog) / span) * 100);
+        return '<div class="rate-row">' +
+          '<div class="rate-code">' + escapeHtml(code) + '</div>' +
+          '<div class="rate-bar-track"><div class="rate-bar-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="rate-value">' + value.toLocaleString(undefined, { maximumFractionDigits: 4 }) + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
     async function refreshRates() {
       try {
         const res = await fetch('/rates.json');
         const data = await res.json();
-        const entries = Object.entries(data.rates)
-          .filter(function (entry) { return entry[1] != null; })
+        const known = Object.entries(data.rates).filter(function (entry) { return entry[1] != null; });
+        const fiat = known.filter(function (entry) { return CRYPTO_CODES.indexOf(entry[0]) === -1; })
+          .sort(function (a, b) { return a[0].localeCompare(b[0]); });
+        const crypto = known.filter(function (entry) { return CRYPTO_CODES.indexOf(entry[0]) !== -1; })
           .sort(function (a, b) { return a[0].localeCompare(b[0]); });
 
-        const logs = entries.map(function (entry) { return Math.log10(entry[1]); });
-        const minLog = Math.min.apply(null, logs);
-        const maxLog = Math.max.apply(null, logs);
-        const span = maxLog - minLog || 1;
-
-        document.getElementById('ratesList').innerHTML = entries.map(function (entry) {
-          var code = entry[0], value = entry[1];
-          var pct = Math.max(4, ((Math.log10(value) - minLog) / span) * 100);
-          return '<div class="rate-row">' +
-            '<div class="rate-code">' + escapeHtml(code) + '</div>' +
-            '<div class="rate-bar-track"><div class="rate-bar-fill" style="width:' + pct + '%"></div></div>' +
-            '<div class="rate-value">' + value.toLocaleString(undefined, { maximumFractionDigits: 4 }) + '</div>' +
-          '</div>';
-        }).join('');
+        var html = '';
+        if (fiat.length) html += '<div class="rate-section-label">Fiat</div>' + renderRateRows(fiat);
+        if (crypto.length) html += '<div class="rate-section-label">Crypto</div>' + renderRateRows(crypto);
+        document.getElementById('ratesList').innerHTML = html;
 
         document.getElementById('ratesAsOf').textContent =
           '1 ' + data.base + ' — updated ' + new Date(data.asOf).toLocaleTimeString();
