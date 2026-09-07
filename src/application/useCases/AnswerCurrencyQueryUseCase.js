@@ -93,18 +93,24 @@ class AnswerCurrencyQueryUseCase {
       total += term.sign * (term.amount / rate) * targetRate;
     }
 
+    for (const term of terms) {
+      term.flag = term.code ? await this.currencyDirectory.getFlag(term.code) : '';
+    }
+
     const breakdown = terms
       .map((term, index) => {
-        const label = `${term.amountLabel} ${term.code || '?'}`;
+        const label = `${term.amountLabel} ${term.code || '?'}${term.flag ? ` ${term.flag}` : ''}`;
         if (index === 0) return term.sign < 0 ? `-${label}` : label;
         return term.sign < 0 ? ` - ${label}` : ` + ${label}`;
       })
       .join('');
 
+    const targetFlag = !hasUnknownCode ? await this.currencyDirectory.getFlag(targetCode) : '';
+
     const reply =
       hasUnknownCode || missingRate
         ? `Unknown currency: ${rawText}`
-        : `${breakdown} = ${total.toFixed(2)} ${targetCode}`;
+        : `${breakdown} = ${total.toFixed(2)} ${targetCode}${targetFlag ? ` ${targetFlag}` : ''}`;
 
     await this.messengerGateway.sendMessage(chatId, reply);
     return reply;

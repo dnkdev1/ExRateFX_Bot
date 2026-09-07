@@ -8,6 +8,11 @@ class CurrencyDirectory {
   async listSupportedCodes() {
     throw new Error('not implemented');
   }
+
+  // returns a flag emoji to display alongside an ISO code, or '' if none
+  async getFlag(_code) {
+    throw new Error('not implemented');
+  }
 }
 
 module.exports = { CurrencyDirectory };

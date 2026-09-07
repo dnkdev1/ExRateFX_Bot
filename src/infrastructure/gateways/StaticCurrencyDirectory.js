@@ -68,6 +68,15 @@ const RU_BARE_STEMS = [
   ['киви', 'NZD'],
 ];
 
+// flag shown alongside each currency; EUR uses the EU flag since the euro
+// isn't tied to one country
+const FLAG_BY_CODE = {
+  USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', JPY: '🇯🇵', AUD: '🇦🇺',
+  CAD: '🇨🇦', CHF: '🇨🇭', CNY: '🇨🇳', HKD: '🇭🇰', NZD: '🇳🇿',
+  SEK: '🇸🇪', KRW: '🇰🇷', SGD: '🇸🇬', NOK: '🇳🇴', MXN: '🇲🇽',
+  INR: '🇮🇳', BRL: '🇧🇷', TRY: '🇹🇷', ZAR: '🇿🇦', VND: '🇻🇳',
+};
+
 function resolveRussian(lower) {
   const normalized = lower.replace(/ё/g, 'е');
   if (!/[а-я]/.test(normalized)) return null;
@@ -101,6 +110,10 @@ class StaticCurrencyDirectory extends CurrencyDirectory {
 
   async listSupportedCodes() {
     return [...SUPPORTED_CODES];
+  }
+
+  async getFlag(code) {
+    return FLAG_BY_CODE[code] || '';
   }
 }
 
