@@ -37,14 +37,16 @@ package "Interface Adapters" {
 }
 
 package "Application (Use Cases)" {
-  rectangle "AnswerCurrencyQueryUseCase\n<<Component>>\n--\nParses bilingual (EN/RU),\ncompound currency queries" <<UseCase>> as AnswerUC
+  rectangle "AnswerCurrencyQueryUseCase\n<<Component>>\n--\nParses bilingual (EN/RU),\ncompound fiat + crypto\ncurrency queries" <<UseCase>> as AnswerUC
   rectangle "RecordMessageUseCase /\nListMessagesUseCase\n<<Component>>" <<UseCase>> as MessageUCs
   rectangle "GetLiveRatesUseCase\n<<Component>>" <<UseCase>> as RatesUC
 }
 
 package "Infrastructure (Gateways)" {
-  rectangle "StaticCurrencyDirectory\n<<Component>>\n--\nEN/RU currency names,\ncodes & flags" <<Gateway>> as CurrencyDir
-  rectangle "ExchangeRateApiGateway\n<<Component>>" <<Gateway>> as RatesGateway
+  rectangle "StaticCurrencyDirectory\n<<Component>>\n--\nEN/RU currency & crypto\nnames, codes, flags/icons" <<Gateway>> as CurrencyDir
+  rectangle "CompositeCurrencyRateGateway\n<<Component>>\n--\nMerges fiat + crypto rates\nbehind one CurrencyRateGateway\ninterface" <<Gateway>> as CompositeGateway
+  rectangle "ExchangeRateApiGateway\n<<Component>>\n--\nFiat rates" <<Gateway>> as RatesGateway
+  rectangle "CoinGeckoRateGateway\n<<Component>>\n--\nCrypto prices" <<Gateway>> as CryptoGateway
   rectangle "TelegramMessengerGateway\n<<Component>>" <<Gateway>> as MessengerGateway
   rectangle "InMemoryMessageRepository\n<<Component>>" <<Gateway>> as MessageRepo
   rectangle "verifyTelegramInitData\n<<Component>>\n--\nHMAC-validates Mini App\nauth tokens" <<Gateway>> as InitDataVerifier
@@ -52,6 +54,7 @@ package "Infrastructure (Gateways)" {
 
 rectangle "Telegram Bot API\n<<External System>>" <<External>> as TelegramApi
 rectangle "Exchange Rate API\n<<External System>>" <<External>> as RatesApi
+rectangle "CoinGecko API\n<<External System>>" <<External>> as CryptoApi
 
 Router --> WebhookCtrl : "POST /webhook/:token"
 Router --> MessagesCtrl : "GET /, /messages.json"
@@ -61,8 +64,8 @@ WebhookCtrl --> MessageUCs : "records incoming\nmessage + bot reply"
 WebhookCtrl --> AnswerUC : "answers currency\nqueries"
 WebhookCtrl --> MessengerGateway : "sends dashboard\nbutton (/start etc.)"
 
-AnswerUC --> CurrencyDir : "resolves currency\ncodes & flags"
-AnswerUC --> RatesGateway : "gets live rates"
+AnswerUC --> CurrencyDir : "resolves currency\ncodes & flags/icons"
+AnswerUC --> CompositeGateway : "gets live rates"
 AnswerUC --> MessengerGateway : "sends reply"
 
 MessagesCtrl --> MessageUCs : "lists messages"
@@ -73,11 +76,15 @@ MiniAppCtrl --> InitDataVerifier : "authenticates the\nMini App user"
 MiniAppCtrl --> MessageUCs : "lists that user's\nmessages"
 
 RatesUC --> CurrencyDir : "lists supported\ncodes"
-RatesUC --> RatesGateway : "gets live rates"
+RatesUC --> CompositeGateway : "gets live rates"
+
+CompositeGateway --> RatesGateway : "fiat codes"
+CompositeGateway --> CryptoGateway : "crypto codes"
 
 MessageUCs --> MessageRepo : "save / list"
 
 MessengerGateway --> TelegramApi
 RatesGateway --> RatesApi
+CryptoGateway --> CryptoApi
 
 @enduml

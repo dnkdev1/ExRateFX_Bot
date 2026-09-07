@@ -27,12 +27,14 @@ package "ExRateFX Bot [Software System]" {
 }
 
 rectangle "Telegram Bot API\n<<External System>>" <<External>> as TelegramApi
-rectangle "Exchange Rate API\n(open.er-api.com)\n<<External System>>" <<External>> as RatesApi
+rectangle "Exchange Rate API\n(open.er-api.com)\n<<External System>>\n--\nFiat rates" <<External>> as RatesApi
+rectangle "CoinGecko API\n<<External System>>\n--\nCrypto prices" <<External>> as CryptoApi
 
 TelegramUser --> TelegramApi : "Sends queries /\nreceives replies"
 TelegramApi --> WebApp : "Forwards messages\n[HTTPS webhook, JSON]\nPOST /webhook/:token"
 WebApp --> TelegramApi : "Sends replies &\ndashboard buttons\n[HTTPS, Bot API]"
-WebApp --> RatesApi : "Fetches live exchange\nrates [HTTPS, JSON]"
+WebApp --> RatesApi : "Fetches live fiat\nrates [HTTPS, JSON]"
+WebApp --> CryptoApi : "Fetches live crypto\nprices [HTTPS, JSON]"
 Viewer --> WebApp : "Views messages log &\ndashboard [HTTPS]\nGET /, /app,\n/messages.json, /rates.json,\n/my-messages.json"
 
 @enduml

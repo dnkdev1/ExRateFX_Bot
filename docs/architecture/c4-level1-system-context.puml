@@ -21,18 +21,21 @@ skinparam rectangle {
 
 rectangle "Telegram User\n<<Person>>\n--\nSends currency conversion\nqueries (English or Russian)\nand reads replies in a\nTelegram chat" <<Person>> as TelegramUser
 
-rectangle "Operator / Viewer\n<<Person>>\n--\nViews the logged chat\nmessages via a web page" <<Person>> as Viewer
+rectangle "Operator / Viewer\n<<Person>>\n--\nViews the logged chat\nmessages and the live-rates\ndashboard via a web page" <<Person>> as Viewer
 
-rectangle "ExRateFX Bot\n<<Software System>>\n--\nParses natural-language,\nmulti-currency queries,\nconverts amounts between\ncurrencies, and replies\nvia Telegram" <<System>> as Bot
+rectangle "ExRateFX Bot\n<<Software System>>\n--\nParses natural-language,\nmulti-currency queries\n(fiat + crypto), converts\namounts between them, and\nreplies via Telegram" <<System>> as Bot
 
 rectangle "Telegram Bot API\n<<External System>>\n--\nMessaging platform that\ndelivers user messages to\nthe bot via webhook and\nsends the bot's replies\nback to users" <<External>> as TelegramApi
 
-rectangle "Exchange Rate API\n(open.er-api.com)\n<<External System>>\n--\nProvides live currency\nexchange rates" <<External>> as RatesApi
+rectangle "Exchange Rate API\n(open.er-api.com)\n<<External System>>\n--\nProvides live fiat currency\nexchange rates" <<External>> as RatesApi
+
+rectangle "CoinGecko API\n<<External System>>\n--\nProvides live cryptocurrency\nprices (BTC, ETH, USDT,\nBNB, XRP)" <<External>> as CryptoApi
 
 TelegramUser --> TelegramApi : "Sends queries /\nreceives replies"
 TelegramApi --> Bot : "Forwards messages\n[HTTPS webhook, JSON]"
 Bot --> TelegramApi : "Sends replies\n[HTTPS, Bot API]"
-Bot --> RatesApi : "Fetches exchange rates\n[HTTPS, JSON]"
-Viewer --> Bot : "Views message log\n[HTTP, GET /, /messages.json]"
+Bot --> RatesApi : "Fetches fiat exchange\nrates [HTTPS, JSON]"
+Bot --> CryptoApi : "Fetches crypto prices\n[HTTPS, JSON]"
+Viewer --> Bot : "Views message log &\ndashboard [HTTP,\nGET /, /messages.json,\n/app, /rates.json]"
 
 @enduml
