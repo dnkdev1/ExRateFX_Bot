@@ -2,11 +2,17 @@
 const TARGET_SPLIT_REGEX = /^(.*?)\s+(?:in|to|в)\s+(.+)$/iu;
 const AMOUNT_REGEX = /^(\d+(?:[.,]\d+)?)\s*(.+)$/;
 const TERM_SPLIT_REGEX = /\s*([+-])\s*/;
+// an optional leading label some clients/users prefix queries with, e.g. "currency: 20 EUR in USD"
+const LEADING_LABEL_REGEX = /^(?:currency|convert|conversion|валюта|конвертация|конверт)\s*:?\s*/i;
+
+function stripLeadingLabel(text) {
+  return text.trim().replace(LEADING_LABEL_REGEX, '');
+}
 
 function splitSourceAndTarget(rawText) {
-  const match = rawText.trim().match(TARGET_SPLIT_REGEX);
+  const match = stripLeadingLabel(rawText).match(TARGET_SPLIT_REGEX);
   if (!match) {
-    return { sourcePart: rawText.trim(), targetPart: null };
+    return { sourcePart: stripLeadingLabel(rawText), targetPart: null };
   }
 
   const [, sourcePart, targetPart] = match;
